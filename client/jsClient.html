@@ -1,0 +1,66 @@
+<html>
+  <head>
+    <title>Web Socket Tests</title>
+  </head>
+  <body>
+    <select id="srv">
+      <option value="wss://echo.websocket.org/" selected="selected">Echo Server</option>
+      <option value="ws://localhost:8080/">localhost</option>
+    </select>
+    <button type="button" onclick="init();">Open</button>
+    <button type="button" onclick="doSend(Math.random().toString());">Send</button>
+    <button type="button" onclick="doClose();">Close</button>
+    <div id="output"></div>
+    <script>
+      const output = document.getElementById("output");
+      var ws;
+
+      if ("WebSocket" in window) {
+        writeToScreen("WebSocket is supported by your Browser!", "black");
+      } else {
+        writeToScreen("WebSocket is NOT supported by your Browser!", "red");
+      }
+
+      function init() {
+        const ele = document.getElementById("srv");
+        const url = ele.options[ele.selectedIndex].value;
+
+        ws = new WebSocket(url);
+        ws.onopen = function() {
+          writeToScreen("[onopen]", "black");
+          doSend("do sending in onopen function");
+        };
+
+        ws.onmessage = function (evt) { 
+          writeToScreen("[onmessage]", "black");
+          writeToScreen(`[response] ${evt.data}`, "green");
+        };
+
+        ws.onclose = function(evt) {
+          writeToScreen("[onclose]", "black");
+        };
+
+        ws.onerror() = function(evt) {
+          writeToScreen("[onerror]", "black");
+          writeToScreen(`[error] ${evt.data}`, "red");
+        }
+      }
+
+      function writeToScreen(msg, color) {
+        var p = document.createElement("p");
+        p.style.wordWrap = "break-word";
+        p.innerHTML = `<span style="color: ${color}">${msg}</span>`;
+        output.append(p);
+      }
+
+      function doSend(msg) {
+        writeToScreen(msg, "blue");
+        ws.send(msg);
+      }
+
+      function doClose() {
+        ws.close();
+      }
+    </script>
+  </body>
+</html>
